@@ -4,7 +4,7 @@
 - Cochez les cases correspondant à vos réponses en remplaçant [ ] par [x]
 - Les questions à choix multiples sont précisées
 - Compléter le document et l'envoyer à l'adresse mail noelie.roux2@eemi.com
-- Prénom Nom : _Mouhamadou Soumare______________________
+- Prénom Nom : _Mouhamadou Soumare___EEMI___M2_CTO&Tech-Lead
 
 ## 1. Fondamentaux de l'accessibilité
 
@@ -617,6 +617,107 @@ Critères d'évaluation :
 - Gestion correcte du focus et navigation clavier
 - Structure des composants et props
 - Gestion de l'état
+
+Composant Accordéon: 
+```javascript
+"use client"
+import { useState, useEffect, useRef } from "react";
+
+const Accordion = ({ children }) => {
+  const [openIndex, setOpenIndex] = useState(null);
+
+  const handleToggle = (index) => {
+    setOpenIndex(openIndex === index ? null : index);
+  };
+
+  return <div>{children({ openIndex, handleToggle })}</div>;
+};
+
+const AccordionItem = ({ children, index, openIndex, handleToggle }) => {
+  return (
+    <div className="accordion-item">
+      {children({ index, openIndex, handleToggle })}
+    </div>
+  );
+};
+
+const AccordionHeader = ({ children, index, openIndex, handleToggle }) => {
+  const isOpen = openIndex === index;
+
+  return (
+    <button
+      onClick={() => handleToggle(index)}
+      aria-expanded={isOpen}
+      aria-controls={`panel-${index}`}
+      id={`header-${index}`}
+      className={`accordion-header w-full text-left p-4 border-b-2 focus:outline-none transition-colors duration-300 ${isOpen ? "bg-blue-600 text-white" : "bg-gray-200"}`}
+    >
+      {children}
+      <span className={`ml-2 transform transition-transform ${isOpen ? "rotate-180" : ""}`}>&#9660;</span> {/* Triangle icon */}
+    </button>
+  );
+};
+
+const AccordionPanel = ({ children, index, openIndex }) => {
+  const panelRef = useRef(null);
+  const isOpen = openIndex === index;
+
+  useEffect(() => {
+    if (isOpen) {
+      panelRef.current?.focus();
+    }
+  }, [isOpen]);
+
+  return (
+    <div
+      id={`panel-${index}`}
+      role="region"
+      aria-labelledby={`header-${index}`}
+      tabIndex={-1}
+      ref={panelRef}
+      className={`accordion-panel transition-all duration-300 ease-in-out ${isOpen ? "block p-4" : "hidden"}`}
+    >
+      {children}
+    </div>
+  );
+};
+
+export default function AccordionComponent() {
+  return (
+    <Accordion>
+      {({ openIndex, handleToggle }) => (
+        <>
+          <AccordionItem index={0} openIndex={openIndex} handleToggle={handleToggle}>
+            {({ index, openIndex, handleToggle }) => (
+              <>
+                <AccordionHeader index={index} openIndex={openIndex} handleToggle={handleToggle}>
+                  Section 1
+                </AccordionHeader>
+                <AccordionPanel index={index} openIndex={openIndex}>
+                  Contenu de la section 1
+                </AccordionPanel>
+              </>
+            )}
+          </AccordionItem>
+          <AccordionItem index={1} openIndex={openIndex} handleToggle={handleToggle}>
+            {({ index, openIndex, handleToggle }) => (
+              <>
+                <AccordionHeader index={index} openIndex={openIndex} handleToggle={handleToggle}>
+                  Section 2
+                </AccordionHeader>
+                <AccordionPanel index={index} openIndex={openIndex}>
+                  Contenu de la section 2
+                </AccordionPanel>
+              </>
+            )}
+          </AccordionItem>
+        </>
+      )}
+    </Accordion>
+  );
+}
+
+```
 
 ## Bonus
 
